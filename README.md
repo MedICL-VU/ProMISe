@@ -5,5 +5,7 @@ The code will be cleaned around 10th Nov.. I'm so busy these day, so sorry.
 Please shot an email to hao.li.1@vanderbilt.edu for any questions and always happy to help! :)
 
 
-we use colon and pancreas datasets from MSD in our experiments.
-[I'm an inline-style link](https://www.google.com)
+we use colon and pancreas datasets from [MSD](http://medicaldecathlon.com/) in our experiments. Preprocessed data obtained from [prior work, 3DSAM-adapter] (https://github.com/med-air/3DSAM-adapter).
+
+We thank authors to share their code and data preprocess steps. 
+
