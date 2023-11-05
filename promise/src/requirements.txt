@@ -1,0 +1,10 @@
+batchgenerators==0.25
+matplotlib==3.7.1
+MedPy==0.4.0
+monai==1.1.0
+nibabel==5.1.0
+numpy==1.24.3
+scipy==1.9.1
+scikit-image
+nibabel
+einops
