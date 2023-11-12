@@ -1,5 +1,13 @@
 # ProMISe
 ProMISe: **Pro**mpt-driven  3D **M**edical **I**mage **Se**gmentation Using Pretrained Image Foundation Models
+```
+@article{li2023promise,
+  title={Promise: Prompt-driven 3D Medical Image Segmentation Using Pretrained Image Foundation Models},
+  author={Li, Hao and Liu, Han and Hu, Dewei and Wang, Jiacheng and Oguz, Ipek},
+  journal={arXiv preprint arXiv:2310.19721},
+  year={2023}
+}
+```
 
 
 11/11/23
