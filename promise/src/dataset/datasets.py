@@ -76,7 +76,7 @@ def load_data_volume(
     fold=0,
     rand_crop_spatial_size=(96, 96, 96),
     convert_to_sam=False,
-    do_test_crop=True,
+    do_test_crop=False,
     do_val_crop=True,
     do_nnunet_intensity_aug=False,
     num_worker=4,
