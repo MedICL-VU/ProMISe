@@ -1,7 +1,12 @@
 # ProMISe
 ProMISe: **Pro**mpt-driven  3D **M**edical **I**mage **Se**gmentation Using Pretrained Image Foundation Models
 
-The code will be cleaned around 10th Nov.. I'm so busy these day, so sorry.
+
+11/11/23
+Updated training process, and test part will be test and upload soon.
+
+
+
 Please shot an email to hao.li.1@vanderbilt.edu for any questions and always happy to help! :)
 
 
