@@ -10,19 +10,42 @@ from segment_anything import SamAutomaticMaskGenerator, sam_model_registry
 from torch.optim import AdamW
 from monai.losses import DiceCELoss, DiceLoss
 def load_data_set(args, split=''):
-    test_data = load_data_volume(
-                        data=args.data,
-                        batch_size=1,
-                        path_prefix=args.data_dir,
-                        augmentation=False,
-                        split=split,
-                        rand_crop_spatial_size=args.rand_crop_size,
-                        convert_to_sam=False,
-                        do_test_crop=False,
-                        deterministic=True,
-                        num_worker=0,
-                    )
-    return test_data
+    if args.split == 'train':
+        data = load_data_volume(
+            data=args.data,
+            data_dir=args.data_dir,
+            batch_size=args.batch_size,
+            augmentation=True,
+            split="train",
+            rand_crop_spatial_size=args.rand_crop_size,
+            num_worker=args.num_worker
+        )
+    elif args.split == 'val':
+        data = load_data_volume(
+            data=args.data,
+            data_dir=args.data_dir,
+            batch_size=1,
+            augmentation=False,
+            split="val",
+            deterministic=True,
+            rand_crop_spatial_size=args.rand_crop_size,
+            num_worker=args.num_worker
+        )
+    else:
+        data = load_data_volume(
+        data=args.data,
+        batch_size=1,
+        data_dir=args.data_dir,
+        augmentation=False,
+        split="test",
+        rand_crop_spatial_size=args.rand_crop_size,
+        convert_to_sam=False,
+        do_test_crop=False,
+        deterministic=True,
+        num_worker=args.num_worker
+    )
+
+    return data
 
 
 
@@ -52,7 +75,7 @@ def load_model(args):
         img_encoder.to(args.device)
     else:
         # please download pretrained SAM model (vit_b), and put it in the "/src/ckpl"
-        sam = sam_model_registry["vit_b"](checkpoint="src/ckpt/sam_vit_b_01ec64.pth")
+        sam = sam_model_registry["vit_b"](checkpoint=args.checkpoint_sam)
         mask_generator = SamAutomaticMaskGenerator(sam)
         img_encoder.load_state_dict(mask_generator.predictor.model.image_encoder.state_dict(), strict=False)
         del sam
@@ -95,8 +118,9 @@ def load_model(args):
 
     # mask decoder
     mask_decoder = VIT_MLAHead(img_size=96).to(args.device)
-    mask_decoder.load_state_dict(torch.load(os.path.join(args.snapshot_path, file), map_location='cpu')["decoder_dict"],
-                          strict=True)
+    if args.split == 'test':
+        mask_decoder.load_state_dict(torch.load(os.path.join(args.snapshot_path, file), map_location='cpu')["decoder_dict"],
+                              strict=True)
     mask_decoder.to(args.device)
 
 
@@ -112,26 +136,3 @@ def load_model(args):
         return model_dict, parameter_list
 
 
-def load_optimizer_scheduler_loss(args, model_dict, parameter_list):
-    img_encoder, prompt_encoder_list, mask_decoder = model_dict['img_encoder'], model_dict['prompt_encoder_list'], \
-        model_dict['mask_decoder']
-
-    encoder_opt = AdamW([i for i in img_encoder.parameters() if i.requires_grad == True], lr=args.lr, weight_decay=0)
-    encoder_scheduler = torch.optim.lr_scheduler.LinearLR(encoder_opt, start_factor=1.0, end_factor=0.01,
-                                                          total_iters=500)
-    feature_opt = AdamW(parameter_list, lr=args.lr, weight_decay=0)
-    feature_scheduler = torch.optim.lr_scheduler.LinearLR(feature_opt, start_factor=1.0, end_factor=0.01,
-                                                          total_iters=500)
-    decoder_opt = AdamW([i for i in mask_decoder.parameters() if i.requires_grad == True], lr=args.lr, weight_decay=0)
-    decoder_scheduler = torch.optim.lr_scheduler.LinearLR(decoder_opt, start_factor=1.0, end_factor=0.01,
-                                                          total_iters=500)
-
-    opt_sche_dict = {'image_encoder': {'optimizer': encoder_opt, 'scheduler': encoder_scheduler},
-                     'prompt_encoder': {'optimizer': feature_opt, 'scheduler': feature_scheduler},
-                     'decoder': {'optimizer': encoder_opt, 'scheduler': decoder_scheduler}
-                     }
-    dice_loss = DiceLoss(include_background=False, softmax=True, to_onehot_y=True, reduction="none")
-    loss_cal = DiceCELoss(include_background=False, softmax=True, to_onehot_y=True, lambda_dice=0.5, lambda_ce=0.5)
-
-    loss_dict = {'dice': dice_loss, 'dice_ce': loss_cal}
-    return opt_sche_dict, loss_dict
