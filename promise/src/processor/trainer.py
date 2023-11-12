@@ -1,6 +1,7 @@
 import torch
 import torch.nn.functional as F
 from src.utils.util import get_points
+import numpy as np
 def trainer(args, logger, epoch_num, train_data, img_encoder, prompt_encoder_list, mask_decoder,
              pooling_layer, encoder_opt, prompt_opt, decoder_opt,
                                 loss_summary, loss_boundary, loss_segmentation
@@ -74,4 +75,6 @@ def trainer(args, logger, epoch_num, train_data, img_encoder, prompt_encoder_lis
         encoder_opt.step()
         decoder_opt.step()
         prompt_opt.step()
+    logger.info("- Train metrics: " + str(np.mean(loss_summary)))
+    return loss_summary
 

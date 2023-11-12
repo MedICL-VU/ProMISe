@@ -1,7 +1,7 @@
 import torch
 import torch.nn.functional as F
 from src.utils.util import get_points
-
+import numpy as np
 
 
 def validater(args, val_data, logger, epoch_num,
@@ -41,3 +41,5 @@ def validater(args, val_data, logger, epoch_num,
             logger.info(
                 'epoch: {}/{}, iter: {}/{}'.format(epoch_num, args.max_epoch, idx, len(val_data)) + ": loss:" + str(
                     loss_summary[-1].flatten()[0]))
+        logger.info("- Val metrics: " + str(np.mean(loss_summary)))
+    return loss_summary

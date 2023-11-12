@@ -9,46 +9,46 @@ import torch.nn as nn
 from segment_anything import SamAutomaticMaskGenerator, sam_model_registry
 from torch.optim import AdamW
 from monai.losses import DiceCELoss, DiceLoss
+# def load_data_set(args, split=''):
+#     if split == 'train':
+#         data = load_data_volume(
+#             data=args.data,
+#             data_dir=args.data_dir,
+#             batch_size=args.batch_size,
+#             augmentation=True,
+#             split=split,
+#             rand_crop_spatial_size=args.rand_crop_size,
+#             num_worker=args.num_worker
+#         )
+#     elif split == 'val':
+#         data = load_data_volume(
+#             data=args.data,
+#             data_dir=args.data_dir,
+#             batch_size=1,
+#             augmentation=False,
+#             split=split,
+#             deterministic=True,
+#             rand_crop_spatial_size=args.rand_crop_size,
+#             num_worker=args.num_worker
+#         )
+#     else:
+#         data = load_data_volume(
+#         data=args.data,
+#         batch_size=1,
+#         data_dir=args.data_dir,
+#         augmentation=False,
+#         split=split,
+#         rand_crop_spatial_size=args.rand_crop_size,
+#         convert_to_sam=False,
+#         do_test_crop=False,
+#         deterministic=True,
+#         num_worker=args.num_worker
+#     )
+#
+#     return data
+
+
 def load_data_set(args, split=''):
-    if split == 'train':
-        data = load_data_volume(
-            data=args.data,
-            data_dir=args.data_dir,
-            batch_size=args.batch_size,
-            augmentation=True,
-            split=split,
-            rand_crop_spatial_size=args.rand_crop_size,
-            num_worker=args.num_worker
-        )
-    elif split == 'val':
-        data = load_data_volume(
-            data=args.data,
-            data_dir=args.data_dir,
-            batch_size=1,
-            augmentation=False,
-            split=split,
-            deterministic=True,
-            rand_crop_spatial_size=args.rand_crop_size,
-            num_worker=args.num_worker
-        )
-    else:
-        data = load_data_volume(
-        data=args.data,
-        batch_size=1,
-        data_dir=args.data_dir,
-        augmentation=False,
-        split=split,
-        rand_crop_spatial_size=args.rand_crop_size,
-        convert_to_sam=False,
-        do_test_crop=False,
-        deterministic=True,
-        num_worker=args.num_worker
-    )
-
-    return data
-
-
-def load_data_set1(args, split=''):
 
     if split == 'train':
         augmentation = True

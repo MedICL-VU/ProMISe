@@ -60,9 +60,6 @@ def main():
         prompt_scheduler.step()
         decoder_scheduler.step()
 
-        logger.info("- Train metrics: " + str(np.mean(loss_summary)))
-
-
 
         # validation
         img_encoder.eval()
@@ -70,15 +67,13 @@ def main():
             module.eval()
         mask_decoder.eval()
         # rewrite this as class later on
-        validater(args, val_data, logger, epoch_num,
+        loss_summary_vali = validater(args, val_data, logger, epoch_num,
               img_encoder, prompt_encoder_list, mask_decoder, loss_validation)
-
-        logger.info("- Val metrics: " + str(np.mean(loss_summary)))
 
 
         is_best = False
-        if np.mean(loss_summary) < best_loss:
-            best_loss = np.mean(loss_summary)
+        if np.mean(loss_summary_vali) < best_loss:
+            best_loss = np.mean(loss_summary_vali)
             is_best = True
 
         save_checkpoint({"epoch": epoch_num + 1,

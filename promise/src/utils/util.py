@@ -14,7 +14,7 @@ def save_checkpoint(state, is_best, checkpoint):
         print("Checkpoint Directory does not exist! Masking directory {}".format(checkpoint))
         os.mkdir(checkpoint)
     else:
-        print("Checkpoint DIrectory exists!")
+        print("Checkpoint Directory exists!")
     torch.save(state, filepath_last)
     if is_best:
         if os.path.isfile(filepath_best):
