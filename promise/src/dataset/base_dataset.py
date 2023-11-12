@@ -1,3 +1,4 @@
+import pickle
 from typing import Any, Callable, Dict, Hashable, List, Mapping, Optional, Sequence, Union
 from monai.config import IndexSelection, KeysCollection, SequenceStr
 from monai.transforms import (
@@ -25,6 +26,8 @@ import torch
 import numpy as np
 import nibabel as nib
 import torch.nn.functional as F
+from typing import Any, Callable, Iterable, List, Set, Tuple, TypeVar, Union, cast
+from scipy.ndimage import distance_transform_edt as eucl_distance
 
 class BinarizeLabeld(MapTransform):
     def __init__(

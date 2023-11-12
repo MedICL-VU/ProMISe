@@ -1,6 +1,10 @@
 import pickle
-import os
-from torch.utils.data import DataLoader
+import os, sys
+from torch.utils.data import DataLoader, Dataset
+import torch
+import numpy as np
+import nibabel as nib
+import torch.nn.functional as F
 from .base_dataset import BaseVolumeDataset
 
 
@@ -63,9 +67,9 @@ DATASET_DICT = {
 def load_data_volume(
     *,
     data,
-    path_prefix,
+    data_dir,
     batch_size,
-    data_dir=None,
+    dataset_split=None,
     split="train",
     deterministic=False,
     augmentation=False,
@@ -77,16 +81,16 @@ def load_data_volume(
     do_nnunet_intensity_aug=False,
     num_worker=4,
 ):
-    if not path_prefix:
+    if not data_dir:
         raise ValueError("unspecified data directory")
-    if data_dir is None:
-        data_dir = os.path.join(path_prefix, "split.pkl")
+    if dataset_split is None:
+        dataset_split = os.path.join(data_dir, "split.pkl")
 
-    with open(data_dir, "rb") as f:
+    with open(dataset_split, "rb") as f:
         d = pickle.load(f)[fold][split]
 
-    img_files = [os.path.join(path_prefix, d[i][0].strip("/")) for i in list(d.keys())]
-    seg_files = [os.path.join(path_prefix, d[i][1].strip("/")) for i in list(d.keys())]
+    img_files = [os.path.join(data_dir, d[i][0].strip("/")) for i in list(d.keys())]
+    seg_files = [os.path.join(data_dir, d[i][1].strip("/")) for i in list(d.keys())]
 
     dataset = DATASET_DICT[data](
         img_files,
