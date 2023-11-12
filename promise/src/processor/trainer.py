@@ -2,7 +2,8 @@ import torch
 import torch.nn.functional as F
 from src.utils.util import get_points
 def trainer(args, logger, epoch_num, train_data, img_encoder, prompt_encoder_list, mask_decoder,
-             pooling_layer, opt_sche_dict, loss_summary, loss_dict
+             pooling_layer, encoder_opt, prompt_opt, decoder_opt,
+                                loss_summary, loss_boundary, loss_segmentation
              ):
 
     patch_size = args.rand_crop_size[0]
@@ -35,7 +36,7 @@ def trainer(args, logger, epoch_num, train_data, img_encoder, prompt_encoder_lis
 
         seg = seg.to(device)
         seg = seg.unsqueeze(1)
-        loss_dice = loss_dict['dice_ce'](masks, seg)
+        loss_dice = loss_segmentation(masks, seg)
 
         if seg.sum() > 0:
             seg_edge = abs(seg - pooling_layer(seg))
@@ -45,14 +46,16 @@ def trainer(args, logger, epoch_num, train_data, img_encoder, prompt_encoder_lis
             _, mask_binary = torch.max(mask_probs.data, 1)
             mask_binary = mask_binary.unsqueeze(1).float().requires_grad_(True)
             mask_edge = abs(mask_binary - pooling_layer(mask_binary))
-            loss_distance = loss_dict['mse_loss'](mask_edge, seg_edge) * 10
+            loss_distance = loss_boundary(mask_edge, seg_edge) * 10
         else:
             loss_distance = torch.tensor(0)
         loss = loss_dice + loss_distance
         loss_summary.append(loss_dice.detach().cpu().numpy())
-        opt_sche_dict['image_encoder']['optimizer'].zero_grad()
-        opt_sche_dict['decoder']['optimizer'].zero_grad()
-        opt_sche_dict['prompt_encoder']['optimizer'].zero_grad()
+
+        encoder_opt.zero_grad()
+        decoder_opt.zero_grad()
+        prompt_opt.zero_grad()
+
         loss.backward()
         logger.info(
             'epoch: {}/{}, iter: {}/{}'.format(epoch_num, args.max_epoch, idx, len(train_data))
@@ -67,6 +70,13 @@ def trainer(args, logger, epoch_num, train_data, img_encoder, prompt_encoder_lis
         torch.nn.utils.clip_grad_norm_(img_encoder.parameters(), 1.0)
         torch.nn.utils.clip_grad_norm_(mask_decoder.parameters(), 1.0)
         torch.nn.utils.clip_grad_norm_(prompt_encoder_list[-1].parameters(), 1.0)
-        opt_sche_dict['image_encoder']['optimizer'].step()
-        opt_sche_dict['prompt_encoder']['optimizer'].step()
-        opt_sche_dict['decoder']['optimizer'].step()
+
+        encoder_opt.step()
+        decoder_opt.step()
+        prompt_opt.step()
+
+
+    opt_sche_dict['image_encoder']['optimizer'] = encoder_opt
+    opt_sche_dict['prompt_encoder']['optimizer'] = prompt_opt
+    opt_sche_dict['decoder']['optimizer'] = decoder_opt
+    return opt_sche_dict
