@@ -9,12 +9,13 @@ ProMISe: **Pro**mpt-driven  3D **M**edical **I**mage **Se**gmentation Using Pret
 }
 ```
 
-```
+---------------------------------
 **11/11/23**
 
 
 Updated training process, and test part will be test and upload soon.
-```
+
+---------------------------------
 
 
 Please shot an email to hao.li.1@vanderbilt.edu for any questions and always happy to help! :)
