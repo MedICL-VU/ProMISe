@@ -75,8 +75,3 @@ def trainer(args, logger, epoch_num, train_data, img_encoder, prompt_encoder_lis
         decoder_opt.step()
         prompt_opt.step()
 
-
-    opt_sche_dict['image_encoder']['optimizer'] = encoder_opt
-    opt_sche_dict['prompt_encoder']['optimizer'] = prompt_opt
-    opt_sche_dict['decoder']['optimizer'] = decoder_opt
-    return opt_sche_dict
