@@ -4,7 +4,7 @@ import torch
 import torch.nn.functional as F
 import surface_distance
 from surface_distance import metrics
-from src.utils.util import save_predict
+from src.utils.util import save_predict, save_csv
 
 
 
@@ -78,6 +78,11 @@ def get_final_prediction(args, img, seg_dict, points_dict, img_encoder, prompt_e
     d_min, d_max = patch_dict['d_min'], patch_dict['d_max']
 
 
+
+    # width always follow x_dimension, same as height to y
+    # width is the true width in original one, before apply spatial_index # check datasets.py, --> self.spatial_index
+    # width is the true height in current one, after apply spatial_index
+    # it doesn't matter for trueness, as long as width tightly matches the axis of x_dimension, e.g. axis=4 or dim=4
     w_l = max(0, -w_min)
     w_r = max(0, w_max - points_dict['x_dimension'])
     h_l = max(0, -h_min)
@@ -89,13 +94,13 @@ def get_final_prediction(args, img, seg_dict, points_dict, img_encoder, prompt_e
     h_min = max(0, h_min)
     w_min = max(0, w_min)
 
-    img_patch = img[:, :, d_min:d_max, w_min:w_max, h_min:h_max].clone()
+    img_patch = img[:, :, d_min:d_max, h_min:h_max, w_min:w_max].clone()
     # the pad follows the format (pad ordering) of torch
     # pad deals the points that are not included in the original patch (default size: 128^3)
     # if such case happens, the points values are negative
     # global query in prompt encoder is a learnable variable
-    # this may because the point values represent the coordinate information with a shifted origin (-d_min, -w_min, -h_min)
-    img_patch = F.pad(img_patch, (h_l, h_r, w_l, w_r, d_l, d_r))
+    # this may because the point values represent the coordinate information with a shifted origin (-d_min, -h_min, -w_min)
+    img_patch = F.pad(img_patch, (w_l, w_r, h_l, h_r, d_l, d_r)) # follow the format of torch pad function
 
     pred = model_predict(args,
                          img_patch,
@@ -103,13 +108,13 @@ def get_final_prediction(args, img, seg_dict, points_dict, img_encoder, prompt_e
                          img_encoder,
                          prompt_encoder_list,
                          mask_decoder)
-    pred = pred[:, :, d_l:patch_size - d_r, w_l:patch_size - w_r, h_l:patch_size - h_r]
+    pred = pred[:, :, d_l:patch_size - d_r, h_l:patch_size - h_r, w_l:patch_size - w_r]
     pred = F.softmax(pred, dim=1)[:, 1]
     # seg_pred is not meta tensor
     # seg_pred = torch.zeros(1, 1, points_dict['x_dimension'], points_dict['z_dimension'], points_dict['y_dimension']).to(device)
     # zeros_like carries meta tensor
     seg_pred = torch.zeros_like(img).to(device)[:, 0, :].unsqueeze(0)
-    seg_pred[:, :, d_min:d_max, w_min:w_max, h_min:h_max] += pred
+    seg_pred[:, :, d_min:d_max, h_min:h_max, w_min:w_max] += pred
 
     final_pred = F.interpolate(seg_pred, size=seg.shape[2:], mode="trilinear")
     img_orig = F.interpolate(img, size=seg.shape[2:], mode="trilinear")
@@ -120,8 +125,8 @@ def get_final_prediction(args, img, seg_dict, points_dict, img_encoder, prompt_e
 
 def get_points(prompt, sample):
     z = torch.where(prompt == 1)[2][sample].unsqueeze(1)  # --> tensor([[x_value]]) instead of tensor([x_value])
-    x = torch.where(prompt == 1)[3][sample].unsqueeze(1)
-    y = torch.where(prompt == 1)[4][sample].unsqueeze(1)
+    x = torch.where(prompt == 1)[4][sample].unsqueeze(1)  # check datasets.py, --> self.spatial_index
+    y = torch.where(prompt == 1)[3][sample].unsqueeze(1)
     return x, y, z
 def get_points_location(args, prompt):
     """
@@ -130,8 +135,10 @@ def get_points_location(args, prompt):
     l = len(torch.where(prompt == 1)[0])
     sample = np.random.choice(np.arange(l), args.num_prompts, replace=True)
     x, y, z = get_points(prompt, sample)
+
+    # this x, y, z location follows the original after change spatial_index
     points_dict = {'x_location': x, 'y_location': y, 'z_location': z,
-                   'x_dimension': prompt.shape[3], 'y_dimension': prompt.shape[4], 'z_dimension': prompt.shape[2]}
+                   'x_dimension': prompt.shape[4], 'y_dimension': prompt.shape[3], 'z_dimension': prompt.shape[2]}
     return points_dict
 def get_input(args, img, seg):
     seg = seg.float().unsqueeze(0)
@@ -191,8 +198,6 @@ def tester(args, logger,
         final_pred, img_orig_space = get_final_prediction(args, img, seg_dict, points_dict, img_encoder,
                                                                       prompt_encoder_list, mask_decoder)
 
-
-
         masks = final_pred > 0.5
         loss_list, loss_nsd_list, loss, nsd = calculate_cost(args,
                                                   masks, seg_dict['seg'],
@@ -203,12 +208,8 @@ def tester(args, logger,
             " Case {}/{} {} - Dice {:.6f} | NSD {:.6f}".format(
                 idx + 1, len(test_data.dataset.img_dict), test_data.dataset.img_dict[idx], loss.item(), nsd))
 
-        # if args.save_predictions:
-        #     save_predict(args, logger,
-        #                  final_pred, seg_dict['seg'], masks,
-        #                  img_orig_space, points_dict,
-        #                  idx, test_data, image_data,
-        #                  patient_name, save_base_dir)
+        if args.save_predictions:
+            save_predict(args, logger, final_pred, seg_dict['seg'], masks, points_dict, idx, test_data, image_data, patient_name) # coordinates are recorded in the log file
 
 
     # all subject
@@ -216,3 +217,6 @@ def tester(args, logger,
     logger.info("- Test metrics Dice: " + str(mean_dice))
     logger.info("- Test metrics NSD: " + str(mean_nsd))
     logger.info("----------------------")
+
+    if args.save_csv:
+        save_csv(args, logger, patient_list, loss_list, loss_nsd_list)

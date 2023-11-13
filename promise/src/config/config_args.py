@@ -35,9 +35,10 @@ parser.add_argument("--boundary_kernel_size", default=5, type=int,
 
 # saving
 parser.add_argument("--save_predictions", action="store_true")
-parser.add_argument("--save_dir_test", default='', type=str, )
-parser.add_argument("--save_name", default='testing_only', type=str, )
 parser.add_argument("--save_csv", action="store_true")
+parser.add_argument("--save_base_dir", default='', type=str, )
+parser.add_argument("--save_name", default='testing_only', type=str, )
+
 
 
 

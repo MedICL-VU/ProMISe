@@ -74,48 +74,63 @@ def get_points(args, seg, num_positive=10, num_negative=20):
     return points_torch
 
 
+def save_csv(args, logger, patient_list,
+             loss, loss_nsd,
+             ):
+    save_predict_dir = os.path.join(args.save_base_dir, 'csv_file')
+    if not os.path.exists(save_predict_dir):
+        os.makedirs(save_predict_dir)
 
+    df_dict = {'patient': patient_list,
+               'dice': loss,
+               'nsd': loss_nsd,
+               }
+
+    df = pandas.DataFrame(df_dict)
+    df.to_csv(os.path.join(save_predict_dir, 'prompt_' + str(args.num_prompts)
+                           + '_' + str(args.save_name) + '.csv'), index=False)
+    logger.info("- CSV saved")
+
+
+def save_image(save_array, test_data, image_data, save_prediction_path):
+    nib.save(nib.Nifti1Image(save_array[0, 0, :].permute(test_data.dataset.spatial_index).cpu().numpy(),
+                             image_data.affine, image_data.header), save_prediction_path)
 
 def save_predict(args, logger,
         final_pred, seg, pred,
         points_dict,
         idx, test_data, image_data,
-        patient_name, save_predict_dir):
+        patient_name):
 
     device = args.device
-    save_predict_dir = os.path.join(save_predict_dir, 'predictions')
+    save_predict_dir = os.path.join(args.save_base_dir, 'predictions')
     if not os.path.exists(save_predict_dir):
         os.makedirs(save_predict_dir)
 
     x, y, z = points_dict['x_location'], points_dict['y_location'], points_dict['z_location']
     x_dimension, y_dimension, z_dimension = points_dict['x_dimension'], points_dict['y_dimension'], points_dict['z_dimension']
     # order see save_name and apply permute --> permute(test_data.dataset.spatial_index)
-    new_x = torch.round(x * seg.shape[3] / x_dimension).long()
-    new_y = torch.round(y * seg.shape[4] / y_dimension).long()
+    new_x = torch.round(x * seg.shape[4] / x_dimension).long()
+    new_y = torch.round(y * seg.shape[3] / y_dimension).long()
     new_z = torch.round(z * seg.shape[2] / z_dimension).long()
 
-    # save_image_aug_path = os.path.join(save_predict_dir, patient_name.replace('.nii.gz', '_image_seed_' + str(seed) + '.nii.gz'))
-    # nib.save(nib.Nifti1Image(img_orig_space[0, 0, :].permute(test_data.dataset.spatial_index).cpu().numpy(),
-    #                          image_data.affine, image_data.header), save_image_aug_path)
+    save_prediction_path = os.path.join(save_predict_dir, patient_name.replace('.nii.gz', '_prediction' + '.nii.gz'))
+    save_image(pred, test_data, image_data, save_prediction_path)
 
-    save_prediction_path = os.path.join(save_predict_dir, patient_name.replace('.nii.gz', '_prediction_seed_' + '.nii.gz'))
-    nib.save(nib.Nifti1Image(pred[0, 0, :].permute(test_data.dataset.spatial_index).cpu().numpy(),
-                             image_data.affine, image_data.header), save_prediction_path)
 
     seg_points = torch.zeros_like(seg).to(device)
-    seg_points[0, 0, new_z, new_x, new_y] = 1
-    save_point_path = os.path.join(save_predict_dir, patient_name.replace('.nii.gz', '_point_seed_' + '.nii.gz'))
-    nib.save(nib.Nifti1Image(seg_points[0, 0, :].permute(test_data.dataset.spatial_index).cpu().numpy(),
-                        image_data.affine, image_data.header), save_point_path)
+    seg_points[0, 0, new_z, new_y, new_x] = 1
+    save_point_path = os.path.join(save_predict_dir, patient_name.replace('.nii.gz', '_point' + '.nii.gz'))
+    save_image(seg_points, test_data, image_data, save_point_path)
 
-    save_probability_path = os.path.join(save_predict_dir, patient_name.replace('.nii.gz', '_probability_seed_' + '.nii.gz'))
-    nib.save(nib.Nifti1Image(final_pred[0, 0, :].permute(test_data.dataset.spatial_index).cpu().numpy(),
-                        image_data.affine, image_data.header), save_probability_path)
+
+    save_probability_path = os.path.join(save_predict_dir, patient_name.replace('.nii.gz', '_probability' + '.nii.gz'))
+    save_image(final_pred, test_data, image_data, save_probability_path)
 
     logger.info(
         "- Case {} - x {} | y {} | z{} | prediction saved".format(test_data.dataset.img_dict[idx],
-                                                                  new_x.cpu().numpy()[0][0],
-                                                                  new_y.cpu().numpy()[0][0],
-                                                                  new_z.cpu().numpy()[0][0]
+                                                                  new_x.cpu().numpy()[0][0] + 1,
+                                                                  new_y.cpu().numpy()[0][0] + 1,
+                                                                  new_z.cpu().numpy()[0][0] + 1
                                                                   ))
 
