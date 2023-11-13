@@ -35,8 +35,12 @@ python train.py --data colon --data_dir your_data_directory --save_dir to_save_m
 ```
 python test.py --data colon --data_dir your_data_directory --save_dir to_save_model_and_log --split test
 ```
+
+
 use [pretrained ProMISe](https://drive.google.com/drive/folders/1Yol2tIaNYVve6JQ3osg2pjDRgwVeS-IF?usp=sharing).
 --use_pretrain --pretrain_path /your_downladed_path/colon_pretrain_promise.pth
+
+
 **Tips**
 
 - Set "num_worker" based on your cpu to boost the data loading speed, it matters. From my device, loading data takes 30 seconds if num_workers = 1.
