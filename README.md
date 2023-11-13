@@ -20,8 +20,6 @@ ProMISe: **Pro**mpt-driven  3D **M**edical **I**mage **Se**gmentation Using Pret
 python train.py --data colon --data_dir your_data_directory --save_dir to_save_model_and_log
 ```
 
-
----------------------------------
 **Test**
 
 ```
