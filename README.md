@@ -12,7 +12,8 @@ ProMISe: **Pro**mpt-driven  3D **M**edical **I**mage **Se**gmentation Using Pret
 ---------------------------------
 **Recent news**
 
-(11/13/23) The [pretrained ProMISe](https://drive.google.com/drive/folders/1Yol2tIaNYVve6JQ3osg2pjDRgwVeS-IF?usp=sharing). models and [datasets](https://drive.google.com/drive/folders/13uGNb2WQhSQcBQIUhnvYJere1LBYGDsW?usp=sharing) are uploaded.
+(11/13/23) The [pretrained ProMISe](https://drive.google.com/drive/folders/1Yol2tIaNYVve6JQ3osg2pjDRgwVeS-IF?usp=sharing) models and [datasets](https://drive.google.com/drive/folders/13uGNb2WQhSQcBQIUhnvYJere1LBYGDsW?usp=sharing) are uploaded.
+
 (11/12/23) The code is uploaded and updated.
 
 ---------------------------------
