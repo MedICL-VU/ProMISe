@@ -15,6 +15,16 @@ ProMISe: **Pro**mpt-driven  3D **M**edical **I**mage **Se**gmentation Using Pret
 (11/12/23) The code is uploaded and updated.
 
 ---------------------------------
+**Installation**
+```
+conda create -n promise python=3.9y
+conda activate promise
+pip install torch==1.12.1+cu113 torchvision==0.13.1+cu113 --extra-index-url https://download.pytorch.org/whl/cu113 # install pytorch
+pip install git+https://github.com/facebookresearch/segment-anything.git # install segment anything packages
+pip install git+https://github.com/deepmind/surface-distance.git # for normalized surface dice (NSD) evaluation
+pip install -r requirements.txt
+```
+
 **Training**
 ```
 python train.py --data colon --data_dir your_data_directory --save_dir to_save_model_and_log
