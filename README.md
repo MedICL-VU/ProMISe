@@ -16,6 +16,20 @@ ProMISe: **Pro**mpt-driven  3D **M**edical **I**mage **Se**gmentation Using Pret
 Updated training process, and the inference part will be test and upload soon.
 
 ---------------------------------
+**Training**
+```
+python train.py --data colon --data_dir your_data_directory --save_dir to_save_model_and_log
+```
+
+
+---------------------------------
+**Test**
+
+```
+python test.py --data colon --data_dir your_data_directory --save_dir to_save_model_and_log --split test
+```
+
+---------------------------------
 
 
 Please shot an email to hao.li.1@vanderbilt.edu for any questions and always happy to help! :)
