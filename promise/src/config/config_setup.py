@@ -72,11 +72,18 @@ def load_data_set(args, split=''):
     return data
 
 
-def load_model(args):
-    if args.checkpoint == "last":
-        file = "last.pth.tar"
+def load_model(args, logger):
+    if args.use_pretrain:
+        file_path = args.pretrain_path
+        logger.info("- using pretrained model: {}".format(args.pretrain_path))
     else:
-        file = "best.pth.tar"
+        if args.checkpoint == "last":
+            file = "last.pth.tar"
+        else:
+            file = "best.pth.tar"
+        file_path = os.path.join(args.save_dir, file)
+        logger.info("- using pretrained model: {}".format(file_path))
+    pretrained_model = torch.load(file_path, map_location='cpu')
     # image encoder
     img_encoder = Promise(
             depth=12,
@@ -94,7 +101,7 @@ def load_model(args):
             out_chans=256,
             num_slice=16)
     if args.split == 'test':
-        img_encoder.load_state_dict(torch.load(os.path.join(args.save_dir, file), map_location='cpu')["encoder_dict"], strict=True)
+        img_encoder.load_state_dict(pretrained_model["encoder_dict"], strict=True)
         img_encoder.to(args.device)
     else:
         # please download pretrained SAM model (vit_b), and put it in the "/src/ckpl"
@@ -131,8 +138,7 @@ def load_model(args):
                 mlp_dim=2048,
                 num_heads=8))
         if args.split == 'test':
-            prompt_encoder.load_state_dict(
-                torch.load(os.path.join(args.save_dir, file), map_location='cpu')["feature_dict"][i], strict=True)
+            prompt_encoder.load_state_dict(pretrained_model["feature_dict"][i], strict=True)
 
 
         prompt_encoder.to(args.device)
@@ -142,8 +148,14 @@ def load_model(args):
     # mask decoder
     mask_decoder = VIT_MLAHead(img_size=96).to(args.device)
     if args.split == 'test':
-        mask_decoder.load_state_dict(torch.load(os.path.join(args.save_dir, file), map_location='cpu')["decoder_dict"],
-                              strict=True)
+        if 'pretrain_promise' in file_path:
+            print('using pretrained ProMISe')
+            pretrained_model['decoder_dict']['head.0.weight'] = pretrained_model['decoder_dict']['cls_hao.0.weight']
+            del pretrained_model['decoder_dict']['cls_hao.0.weight']
+            pretrained_model['decoder_dict']['head.3.weight'] = pretrained_model['decoder_dict']['cls_hao.3.weight']
+            del pretrained_model['decoder_dict']['cls_hao.3.weight']
+
+        mask_decoder.load_state_dict(pretrained_model["decoder_dict"], strict=True)
     mask_decoder.to(args.device)
 
 

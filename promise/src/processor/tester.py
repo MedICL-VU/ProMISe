@@ -136,6 +136,7 @@ def get_points_location(args, prompt):
     sample = np.random.choice(np.arange(l), args.num_prompts, replace=True)
     x, y, z = get_points(prompt, sample)
 
+
     # this x, y, z location follows the original after change spatial_index
     points_dict = {'x_location': x, 'y_location': y, 'z_location': z,
                    'x_dimension': prompt.shape[4], 'y_dimension': prompt.shape[3], 'z_dimension': prompt.shape[2]}

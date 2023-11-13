@@ -31,7 +31,8 @@ parser.add_argument("--num_classes", default=2, type=int)
 parser.add_argument("--tolerance", default=5, type=int)
 parser.add_argument("--boundary_kernel_size", default=5, type=int,
                     help='an integer for kernel size of avepooling layer for boundary generation')
-
+parser.add_argument("--use_pretrain", action="store_true")
+parser.add_argument("--pretrain_path", default="", type=str)
 
 # saving
 parser.add_argument("--save_predictions", action="store_true")
@@ -48,10 +49,6 @@ def check_and_setup_parser(args):
     if args.save_name == 'testing_only':
         warnings.warn("[save_name] (--save_name) should be a real name, currently is for testing purpose (--save_name=testing_only)")
 
-    if args.checkpoint == "last":
-        file = "last.pth.tar"
-    else:
-        file = "best.pth.tar"
     device = args.device
     if args.rand_crop_size == 0:
         if args.data in ["colon", "pancreas", "lits", "kits"]:
@@ -66,4 +63,4 @@ def check_and_setup_parser(args):
 
     if not os.path.exists(args.save_dir):
         os.makedirs(args.save_dir)
-    return device, file
+    return device

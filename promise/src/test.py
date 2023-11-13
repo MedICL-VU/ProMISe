@@ -15,7 +15,7 @@ def main():
     logger.info(str(args))
 
     test_data = load_data_set(args, split='test')
-    model_dict = load_model(args)
+    model_dict = load_model(args, logger)
 
     dice_loss = DiceLoss(include_background=False, softmax=False, to_onehot_y=True, reduction="none")
 
