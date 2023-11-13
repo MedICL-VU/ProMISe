@@ -26,6 +26,20 @@ python train.py --data colon --data_dir your_data_directory --save_dir to_save_m
 python test.py --data colon --data_dir your_data_directory --save_dir to_save_model_and_log --split test
 ```
 
+**Tips**
+
+- Set "num_worker" based on your cpu to boost the data loading speed, it matters. From my device, loading data takes 30 seconds if num_workers = 1.
+- please specify the save_name.
+- don't forget to download the pretrained SAM model from [SAM-B](https://dl.fbaipublicfiles.com/segment_anything/sam_vit_b_01ec64.pth), and set the path as "checkpoint_sam".
+- set "save_prediction" and "save_base_dir" if you want to save inference predictions.
+
+- more details can be viewed in /config/config_args.py
+
+
+
+TODO:
+build this page for better instructions.
+
 ---------------------------------
 
 
