@@ -38,7 +38,8 @@ python test.py --data colon --data_dir your_data_directory --save_dir to_save_mo
 
 
 TODO:
-build this page for better instructions.
+1. build this page for better instructions.
+2. Pytorch DistributedDataParallel.
 
 ---------------------------------
 
