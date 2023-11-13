@@ -15,7 +15,7 @@ def main():
     args = parser.parse_args()
     device, file = check_and_setup_parser(args)
 
-    log_name = args.save_name
+    log_name = 'train_' + args.save_name
     setup_logger(logger_name=log_name, root=args.save_dir, screen=True, tofile=True)
     logger = logging.getLogger(log_name)
     logger.info(str(args))

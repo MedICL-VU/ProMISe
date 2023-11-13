@@ -4,18 +4,22 @@ import warnings
 
 parser = argparse.ArgumentParser()
 
+
+
+
+
 # data
 parser.add_argument("--data", default=None, type=str, choices=["kits", "pancreas", "lits", "colon"])
 parser.add_argument("--save_dir", default="", type=str)
 parser.add_argument("--data_dir", default="", type=str)
+parser.add_argument("--num_worker", default=1, type=int)
 parser.add_argument("--split", default="train", type=str)
-parser.add_argument("--num_worker", default=6, type=int)
+
 
 
 # network
-parser.add_argument("--device", default="cuda:0", type=str)
-parser.add_argument("--network_config", default="", type=str)
 parser.add_argument("--lr", default=4e-4, type=float)
+parser.add_argument("--device", default="cuda:0", type=str)
 parser.add_argument("--max_epoch", default=200, type=int)
 parser.add_argument("--batch_size", default=1, type=int)
 parser.add_argument("--rand_crop_size", default=0, nargs='+', type=int)
@@ -57,7 +61,7 @@ def check_and_setup_parser(args):
         else:
             args.rand_crop_size = tuple(args.rand_crop_size)
 
-    args.save_dir = os.path.join(args.save_dir, args.data)
+    args.save_dir = os.path.join(args.save_dir, args.data, args.save_name)
 
     if not os.path.exists(args.save_dir):
         os.makedirs(args.save_dir)

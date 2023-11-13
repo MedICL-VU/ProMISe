@@ -7,8 +7,10 @@ from config.config_args import *
 from config.config_setup import load_data_set, load_model
 def main():
     args = parser.parse_args()
-    log_name = args.save_name
-    setup_logger(logger_name=log_name, root=args.snapshot_path, screen=True, tofile=True)
+    check_and_setup_parser(args)
+
+    log_name = 'test_' + args.save_name
+    setup_logger(logger_name=log_name, root=args.save_dir, screen=True, tofile=True)
     logger = logging.getLogger(log_name)
     logger.info(str(args))
 
@@ -19,7 +21,7 @@ def main():
 
     loss_summary, loss_nsd = [], []
     with torch.no_grad():
-        tester(args, logger,model_dict, test_data, loss_summary, loss_nsd, dice_loss)
+        tester(args, logger, model_dict, test_data, loss_summary, loss_nsd, dice_loss)
 
     logger.info("- Test done")
 if __name__ == "__main__":

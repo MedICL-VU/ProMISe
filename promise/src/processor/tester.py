@@ -133,9 +133,8 @@ def get_points_location(args, prompt):
     points_dict = {'x_location': x, 'y_location': y, 'z_location': z,
                    'x_dimension': prompt.shape[3], 'y_dimension': prompt.shape[4], 'z_dimension': prompt.shape[2]}
     return points_dict
-def get_input(args, trans_dict):
-    img, seg = trans_dict["image"], trans_dict["label"].unsqueeze(0)
-    seg = seg.float()
+def get_input(args, img, seg):
+    seg = seg.float().unsqueeze(0)
     seg = seg.to(args.device)
     img = img.to(args.device)
     prompt = F.interpolate(seg, img.shape[2:], mode="nearest")
@@ -143,6 +142,26 @@ def get_input(args, trans_dict):
     seg_dict = {'seg': seg, 'prompt': prompt}
     return img, seg_dict, points_dict
 
+
+def calculate_cost(args,
+                   prediction, ground_truth,
+                   loss_function, spacing,
+                   loss_list, loss_nsd_list):
+
+    loss = 1 - loss_function(prediction, ground_truth)
+    loss_value = loss.squeeze(0).squeeze(0).squeeze(0).squeeze(0).squeeze(0).detach().cpu().numpy()
+
+    ssd = surface_distance.compute_surface_distances(
+        (ground_truth == 1)[0, 0].cpu().numpy(),
+        (prediction == 1)[0, 0].cpu().numpy(),
+        spacing_mm=spacing[0].numpy()
+    )
+    nsd = metrics.compute_surface_dice_at_tolerance(ssd, args.tolerance)
+
+    loss_list.append(loss_value)
+    loss_nsd_list.append(nsd)
+
+    return loss_list, loss_nsd_list, loss_value, nsd
 
 
 def tester(args, logger,
@@ -153,7 +172,7 @@ def tester(args, logger,
 
     patient_list = []
 
-    for idx, (trans_dict, spacing) in enumerate(test_data):
+    for idx, (img, seg, spacing) in enumerate(test_data):
         print( 'current / total subjects:  {} / {}'
                .format(idx + 1, len(test_data.dataset.img_dict)))
         image_path = test_data.dataset.img_dict[idx]
@@ -166,7 +185,7 @@ def tester(args, logger,
 
         patient_list.append(patient_name)
 
-        img, seg_dict, points_dict = get_input(args, trans_dict) # get input and point prompt
+        img, seg_dict, points_dict = get_input(args, img, seg) # get input and point prompt
 
         # pred
         final_pred, img_orig_space = get_final_prediction(args, img, seg_dict, points_dict, img_encoder,
@@ -197,24 +216,3 @@ def tester(args, logger,
     logger.info("- Test metrics Dice: " + str(mean_dice))
     logger.info("- Test metrics NSD: " + str(mean_nsd))
     logger.info("----------------------")
-
-
-def calculate_cost(args,
-                   prediction, ground_truth,
-                   loss_function, spacing,
-                   loss_list, loss_nsd_list):
-
-    loss = 1 - loss_function(prediction, ground_truth)
-    loss_value = loss.squeeze(0).squeeze(0).squeeze(0).squeeze(0).squeeze(0).detach().cpu().numpy()
-
-    ssd = surface_distance.compute_surface_distances(
-        (ground_truth == 1)[0, 0].cpu().numpy(),
-        (prediction == 1)[0, 0].cpu().numpy(),
-        spacing_mm=spacing[0].numpy()
-    )
-    nsd = metrics.compute_surface_dice_at_tolerance(ssd, args.tolerance)
-
-    loss_list.append(loss_value)
-    loss_nsd_list.append(nsd)
-
-    return loss_list, loss_nsd_list, loss_value, nsd

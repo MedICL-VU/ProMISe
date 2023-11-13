@@ -94,7 +94,7 @@ def load_model(args):
             out_chans=256,
             num_slice=16)
     if args.split == 'test':
-        img_encoder.load_state_dict(torch.load(os.path.join(args.snapshot_path, file), map_location='cpu')["encoder_dict"], strict=True)
+        img_encoder.load_state_dict(torch.load(os.path.join(args.save_dir, file), map_location='cpu')["encoder_dict"], strict=True)
         img_encoder.to(args.device)
     else:
         # please download pretrained SAM model (vit_b), and put it in the "/src/ckpl"
@@ -132,7 +132,7 @@ def load_model(args):
                 num_heads=8))
         if args.split == 'test':
             prompt_encoder.load_state_dict(
-                torch.load(os.path.join(args.snapshot_path, file), map_location='cpu')["feature_dict"][i], strict=True)
+                torch.load(os.path.join(args.save_dir, file), map_location='cpu')["feature_dict"][i], strict=True)
 
 
         prompt_encoder.to(args.device)
@@ -142,7 +142,7 @@ def load_model(args):
     # mask decoder
     mask_decoder = VIT_MLAHead(img_size=96).to(args.device)
     if args.split == 'test':
-        mask_decoder.load_state_dict(torch.load(os.path.join(args.snapshot_path, file), map_location='cpu')["decoder_dict"],
+        mask_decoder.load_state_dict(torch.load(os.path.join(args.save_dir, file), map_location='cpu')["decoder_dict"],
                               strict=True)
     mask_decoder.to(args.device)
 
