@@ -62,7 +62,7 @@ TODO:
 Please shot an email to hao.li.1@vanderbilt.edu for any questions and always happy to help! :)
 
 
-we use colon and pancreas datasets from [MSD](http://medicaldecathlon.com/) in our experiments. Preprocessed datasets are obtained from [3DSAM-adapter](https://github.com/med-air/3DSAM-adapter/).
+Our code is based on [Segment-Anything](https://github.com/facebookresearch/segment-anything), [3DSAM-adapter](https://github.com/med-air/3DSAM-adapter/), [nnU-net](https://github.com/MIC-DKFZ/nnUNet), [3D UX-Net](https://github.com/MASILab/3DUX-Net), and [Swin UNETR](https://github.com/Project-MONAI/tutorials/blob/main/3d_segmentation/swin_unetr_btcv_segmentation_3d.ipynb).
 
-We thank authors to share their code and data preprocess steps. 
+We thank these authors. 
 
