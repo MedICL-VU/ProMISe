@@ -17,8 +17,7 @@ ProMISe: **Pro**mpt-driven  3D **M**edical **I**mage **Se**gmentation Using Pret
 ---------------------------------
 **Datasets**
 
-We used two public datasets, e.g. task 07 and 10 for pancreas and colon tumor segmentations, respectively. 
-Here are the [datasets](https://drive.google.com/drive/folders/13uGNb2WQhSQcBQIUhnvYJere1LBYGDsW?usp=sharing) that we used for our experiments, which are modified based on the original datasets from [Medical Segmentation Decathlon](http://medicaldecathlon.com/).
+Here are the [datasets](https://drive.google.com/drive/folders/13uGNb2WQhSQcBQIUhnvYJere1LBYGDsW?usp=sharing) that we used in our experiments, which are modified based on the original datasets from [Medical Segmentation Decathlon](http://medicaldecathlon.com/). We used two public datasets, e.g. task 07 and 10 for pancreas and colon tumor segmentations, respectively. 
 
 
 **Installation**
