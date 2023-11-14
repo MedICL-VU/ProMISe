@@ -12,7 +12,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument("--data", default=None, type=str, choices=["kits", "pancreas", "lits", "colon"])
 parser.add_argument("--save_dir", default="", type=str)
 parser.add_argument("--data_dir", default="", type=str)
-parser.add_argument("--num_worker", default=1, type=int)
+parser.add_argument("--num_worker", default=6, type=int)
 parser.add_argument("--split", default="train", type=str)
 
 
@@ -37,8 +37,8 @@ parser.add_argument("--pretrain_path", default="", type=str)
 # saving
 parser.add_argument("--save_predictions", action="store_true")
 parser.add_argument("--save_csv", action="store_true")
-parser.add_argument("--save_base_dir", default='', type=str, )
-parser.add_argument("--save_name", default='testing_only', type=str, )
+parser.add_argument("--save_base_dir", default='', type=str)
+parser.add_argument("--save_name", default='testing_only', type=str)
 
 
 

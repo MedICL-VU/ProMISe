@@ -106,10 +106,10 @@ def load_data_volume(
 
     if deterministic:
         loader = DataLoader(
-            dataset, batch_size=batch_size, shuffle=False, num_workers=num_worker, drop_last=True
+            dataset, batch_size=batch_size, shuffle=False, num_workers=num_worker, drop_last=True, pin_memory=True
         )
     else:
         loader = DataLoader(
-            dataset, batch_size=batch_size, shuffle=True, num_workers=num_worker, drop_last=True
+            dataset, batch_size=batch_size, shuffle=True, num_workers=num_worker, drop_last=True, pin_memory=True
         )
     return loader
