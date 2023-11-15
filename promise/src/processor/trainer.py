@@ -57,27 +57,6 @@ class Trainer(object):
 
         return loss
 
-    def save_model(self, current_loss, epoch_num):
-        is_best = False
-        if np.mean(current_loss) < self.best_loss:
-            self.best_loss = np.mean(current_loss)
-            self.best_epoch = epoch_num
-            is_best = True
-
-        save_checkpoint({"epoch": epoch_num + 1,
-                         "best_val_loss": self.best_loss,
-                         "encoder_dict": self.img_encoder.state_dict(),
-                         "decoder_dict": self.mask_decoder.state_dict(),
-                         "feature_dict": [i.state_dict() for i in self.prompt_encoder_list],
-                         "encoder_opt": self.encoder_opt.state_dict(),
-                         "feature_opt": self.prompt_opt.state_dict(),
-                         "decoder_opt": self.decoder_opt.state_dict()
-                         },
-                        is_best=is_best,
-                        checkpoint=self.args.save_dir)
-        self.logger.info("- Val metrics best: {} at epoch {} " .format(self.best_loss, self.best_epoch))
-
-
     def train(self, epoch_num):
         loss_summary = []
         patch_size = self.args.rand_crop_size[0]
@@ -85,7 +64,7 @@ class Trainer(object):
 
         for idx, (img, seg, spacing) in enumerate(self.train_data):
             out = F.interpolate(img.float(), scale_factor=512 / patch_size, mode='trilinear')
-            input_batch = out.to(device, non_blocking=True)
+            input_batch = out.to(device)
             if self.args.batch_size == 1:
                 input_batch = input_batch[0].transpose(0, 1)
             else:
@@ -129,8 +108,8 @@ class Trainer(object):
             loss_summary.append(loss.detach().cpu().numpy())
 
             self.encoder_opt.zero_grad()
-            self.decoder_opt.zero_grad()
             self.prompt_opt.zero_grad()
+            self.decoder_opt.zero_grad()
 
             loss.backward()
             self.logger.info(
@@ -145,10 +124,35 @@ class Trainer(object):
             torch.nn.utils.clip_grad_norm_(self.prompt_encoder_list[-1].parameters(), 1.0)
 
             self.encoder_opt.step()
-            self.decoder_opt.step()
             self.prompt_opt.step()
+            self.decoder_opt.step()
+
+        self.encoder_scheduler.step()
+        self.prompt_scheduler.step()
+        self.decoder_scheduler.step()
         self.logger.info("- Train metrics: " + str(np.mean(loss_summary)))
-        return loss_summary
+
+
+    def save_model(self, current_loss, epoch_num):
+        is_best = False
+        if np.mean(current_loss) < self.best_loss:
+            self.best_loss = np.mean(current_loss)
+            self.best_epoch = epoch_num
+            is_best = True
+
+        save_checkpoint({"epoch": epoch_num + 1,
+                         "best_val_loss": self.best_loss,
+                         "encoder_dict": self.img_encoder.state_dict(),
+                         "decoder_dict": self.mask_decoder.state_dict(),
+                         "feature_dict": [i.state_dict() for i in self.prompt_encoder_list],
+                         "encoder_opt": self.encoder_opt.state_dict(),
+                         "feature_opt": self.prompt_opt.state_dict(),
+                         "decoder_opt": self.decoder_opt.state_dict()
+                         },
+                        is_best=is_best,
+                        checkpoint=self.args.save_dir)
+        self.logger.info("- Val metrics best: {} at epoch {} " .format(self.best_loss, self.best_epoch))
+
 
 
     def setup(self):

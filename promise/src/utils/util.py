@@ -52,17 +52,20 @@ def get_points(args, seg, num_positive=10, num_negative=20):
     points_torch = None
     if l > 0:
         sample = np.random.choice(np.arange(l), num_positive, replace=True)
-        x = torch.where(seg == 1)[1][sample].unsqueeze(1)
-        y = torch.where(seg == 1)[3][sample].unsqueeze(1)
-        z = torch.where(seg == 1)[2][sample].unsqueeze(1)
+        # --> tensor([[x_value]]) instead of tensor([x_value])
+        # check datasets.py, --> self.spatial_index
+        x = torch.where(seg == 1)[3][sample].unsqueeze(1)
+        y = torch.where(seg == 1)[2][sample].unsqueeze(1)
+        z = torch.where(seg == 1)[1][sample].unsqueeze(1)
+
         points = torch.cat([x, y, z], dim=1).unsqueeze(1).float()
         points_torch = points.to(args.device)
         points_torch = points_torch.transpose(0, 1)
     l = len(torch.where(seg < 10)[0])
     sample = np.random.choice(np.arange(l), num_negative, replace=True)
-    x = torch.where(seg < 10)[1][sample].unsqueeze(1)
-    y = torch.where(seg < 10)[3][sample].unsqueeze(1)
-    z = torch.where(seg < 10)[2][sample].unsqueeze(1)
+    x = torch.where(seg < 10)[3][sample].unsqueeze(1)
+    y = torch.where(seg < 10)[2][sample].unsqueeze(1)
+    z = torch.where(seg < 10)[1][sample].unsqueeze(1)
     points = torch.cat([x, y, z], dim=1).unsqueeze(1).float()
     points_torch_negative = points.to(args.device)
     points_torch_negative = points_torch_negative.transpose(0, 1)

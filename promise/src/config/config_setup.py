@@ -85,7 +85,10 @@ def load_model(args, logger):
             file_path = os.path.join(args.save_dir, file)
             logger.info("- using pretrained model: {}".format(file_path))
         pretrained_model = torch.load(file_path, map_location='cpu')
-
+    else:
+        # please download pretrained SAM model (vit_b), and put it in the "/src/ckpl"
+        sam = sam_model_registry["vit_b"](checkpoint=args.checkpoint_sam)
+        mask_generator = SamAutomaticMaskGenerator(sam)
     # image encoder
     img_encoder = Promise(
             depth=12,
@@ -106,9 +109,6 @@ def load_model(args, logger):
         img_encoder.load_state_dict(pretrained_model["encoder_dict"], strict=True)
         img_encoder.to(args.device)
     else:
-        # please download pretrained SAM model (vit_b), and put it in the "/src/ckpl"
-        sam = sam_model_registry["vit_b"](checkpoint=args.checkpoint_sam)
-        mask_generator = SamAutomaticMaskGenerator(sam)
         img_encoder.load_state_dict(mask_generator.predictor.model.image_encoder.state_dict(), strict=False)
         del sam
         img_encoder.to(args.device)

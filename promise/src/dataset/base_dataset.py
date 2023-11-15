@@ -165,7 +165,6 @@ class BaseVolumeDataset(Dataset):
                     .squeeze(0)
                     .numpy()
                 )
-
         if (self.aug and self.split == "train") or ((self.do_val_crop  and self.split=='val')):
             trans_dict = self.transforms({"image": img, "label": seg})[0]
             img_aug, seg_aug = trans_dict["image"], trans_dict["label"]
