@@ -189,11 +189,10 @@ class Promise(nn.Module):
 
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
-        """
-        patch embedding
-        """
+        # patch embedding
         with torch.no_grad():
             x = self.patch_embed(x)
+
         if self.num_slice > 1:
             x = self.slice_embed(x.permute(3, 1, 2, 0).unsqueeze(0))
             x = x.permute(0, 2, 3, 4, 1)
@@ -204,7 +203,6 @@ class Promise(nn.Module):
         # x = self.m1(x)
         # x = self.m2(x)
         x = x.permute(0, 2, 3, 4, 1)
-
 
         # position embedding
         if self.pos_embed is not None:
@@ -228,11 +226,6 @@ class Promise(nn.Module):
         x = self.neck_3d[-1](x.permute(0, 4, 1, 2, 3))
 
         return x, feature_list
-
-
-
-
-
 
 
 

@@ -59,6 +59,7 @@ def load_data_set(args, split=''):
         args.batch_size = 1
 
     data = load_data_volume(
+
         data=args.data,
         data_dir=args.data_dir,
         batch_size=args.batch_size,
@@ -89,6 +90,7 @@ def load_model(args, logger):
         # please download pretrained SAM model (vit_b), and put it in the "/src/ckpl"
         sam = sam_model_registry["vit_b"](checkpoint=args.checkpoint_sam)
         mask_generator = SamAutomaticMaskGenerator(sam)
+
     # image encoder
     img_encoder = Promise(
             depth=12,
@@ -148,9 +150,9 @@ def load_model(args, logger):
         prompt_encoder_list.append(prompt_encoder)
 
     # mask decoder
-    mask_decoder = VIT_MLAHead(img_size=96).to(args.device)
+    mask_decoder = VIT_MLAHead(img_size=96, num_classes=2).to(args.device)
     if args.split == 'test':
-        if 'pretrain_promise' in file_path:
+        if 'pretrain_promise' in args.pretrain_path:
             print('using pretrained ProMISe')
             pretrained_model['decoder_dict']['head.0.weight'] = pretrained_model['decoder_dict']['cls_hao.0.weight']
             del pretrained_model['decoder_dict']['cls_hao.0.weight']

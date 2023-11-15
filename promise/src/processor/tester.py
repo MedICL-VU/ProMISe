@@ -46,12 +46,13 @@ def get_points_prompt(args, points_dict, cumulative=False):
     y_m = (torch.max(y) + torch.min(y)) // 2
     z_m = (torch.max(z) + torch.min(z)) // 2
 
-    w_min = x_m - patch_size // 2
-    w_max = x_m + patch_size // 2
-    h_min = y_m - patch_size // 2
-    h_max = y_m + patch_size // 2
-    d_min = z_m - patch_size // 2
-    d_max = z_m + patch_size // 2
+    # considered transpose in dataloader, e.g. match to real original images
+    d_min = x_m - patch_size // 2
+    d_max = x_m + patch_size // 2
+    h_min = z_m - patch_size // 2
+    h_max = z_m + patch_size // 2
+    w_min = y_m - patch_size // 2
+    w_max = y_m + patch_size // 2
 
 
 
@@ -79,16 +80,12 @@ def get_final_prediction(args, img, seg_dict, points_dict, img_encoder, prompt_e
 
 
 
-    # width always follow x_dimension, same as height to y
-    # width is the true width in original one, before apply spatial_index # check datasets.py, --> self.spatial_index
-    # width is the true height in current one, after apply spatial_index
-    # it doesn't matter for trueness, as long as width tightly matches the axis of x_dimension, e.g. axis=4 or dim=4
     w_l = max(0, -w_min)
-    w_r = max(0, w_max - points_dict['x_dimension'])
+    w_r = max(0, w_max - points_dict['z_dimension'])
     h_l = max(0, -h_min)
     h_r = max(0, h_max - points_dict['y_dimension'])
     d_l = max(0, -d_min)
-    d_r = max(0, d_max - points_dict['z_dimension'])
+    d_r = max(0, d_max - points_dict['x_dimension'])
 
     d_min = max(0, d_min)
     h_min = max(0, h_min)
@@ -124,9 +121,12 @@ def get_final_prediction(args, img, seg_dict, points_dict, img_encoder, prompt_e
 
 
 def get_points(prompt, sample):
-    z = torch.where(prompt == 1)[2][sample].unsqueeze(1)  # --> tensor([[x_value]]) instead of tensor([x_value])
-    x = torch.where(prompt == 1)[4][sample].unsqueeze(1)  # check datasets.py, --> self.spatial_index
-    y = torch.where(prompt == 1)[3][sample].unsqueeze(1)
+    z = torch.where(prompt == 1)[3][sample].unsqueeze(1)  # --> tensor([[x_value]]) instead of tensor([x_value])
+    x = torch.where(prompt == 1)[2][sample].unsqueeze(1)  # ignore: check datasets.py, --> self.spatial_index
+    y = torch.where(prompt == 1)[4][sample].unsqueeze(1)
+    # consider x,y,z here is a,b,c. and abc need to match features after img_encoder with size (b,c,x,z,y)
+    # e.g. a-->x, b-->z, c-->y
+    # xyz are the coordinates after dataloader, e.g. without consider the self.spatial_index
     return x, y, z
 def get_points_location(args, prompt):
     """
@@ -139,7 +139,7 @@ def get_points_location(args, prompt):
 
     # this x, y, z location follows the original after change spatial_index
     points_dict = {'x_location': x, 'y_location': y, 'z_location': z,
-                   'x_dimension': prompt.shape[4], 'y_dimension': prompt.shape[3], 'z_dimension': prompt.shape[2]}
+                   'x_dimension': prompt.shape[2], 'y_dimension': prompt.shape[3], 'z_dimension': prompt.shape[4]}
     return points_dict
 def get_input(args, img, seg):
     seg = seg.float().unsqueeze(0)

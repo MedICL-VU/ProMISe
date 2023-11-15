@@ -33,6 +33,7 @@ class Trainer(object):
         print('models are loaded and others are set, spent {}'.format(round(time.time() - a, 4)))
 
     def run(self):
+
         for epoch_num in range(self.args.max_epoch):
             for module in self.prompt_encoder_list:
                 module.train()
@@ -58,6 +59,7 @@ class Trainer(object):
         return loss
 
     def train(self, epoch_num):
+
         loss_summary = []
         patch_size = self.args.rand_crop_size[0]
         device = self.args.device
@@ -69,10 +71,13 @@ class Trainer(object):
                 input_batch = input_batch[0].transpose(0, 1)
             else:
                 input_batch = input_batch.transpose(0, 1)
-            batch_features, feature_list = self.img_encoder(input_batch)
+            batch_features, feature_list = self.img_encoder(input_batch) #batch_feature size (b,c,x,z,y) x,y,z is the image size after dataloader, ignore the transpose!
             feature_list.append(batch_features)
 
-            points_torch = get_points(self.args, seg)
+            points_torch = get_points(self.args, seg, split='train')
+
+
+
             new_feature = []
             for i, (feature, prompt_encoder) in enumerate(zip(feature_list, self.prompt_encoder_list)):
                 if i == 3:
@@ -81,7 +86,6 @@ class Trainer(object):
                     )
                 else:
                     new_feature.append(feature)
-
             img_resize = F.interpolate(img[:, 0].permute(0, 2, 3, 1).unsqueeze(1).to(device),
                                        scale_factor=64 / patch_size,
                                        mode='trilinear')
@@ -91,6 +95,7 @@ class Trainer(object):
 
             seg = seg.to(device)
             seg = seg.unsqueeze(1)
+
             loss_dice = self.loss_segmentation(masks, seg)
 
             if seg.sum() > 0:
