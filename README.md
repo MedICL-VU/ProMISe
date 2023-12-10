@@ -26,6 +26,7 @@ Here are the [datasets](https://drive.google.com/drive/folders/13uGNb2WQhSQcBQIU
 ```
 conda create -n promise python=3.9
 conda activate promise
+(Optional): sudo install git
 pip install torch==1.12.1+cu113 torchvision==0.13.1+cu113 --extra-index-url https://download.pytorch.org/whl/cu113 # install pytorch
 pip install git+https://github.com/facebookresearch/segment-anything.git # install segment anything packages
 pip install git+https://github.com/deepmind/surface-distance.git # for normalized surface dice (NSD) evaluation
