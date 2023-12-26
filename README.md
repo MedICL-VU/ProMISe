@@ -1,4 +1,6 @@
 # ProMISe
+[![Paper](https://img.shields.io/badge/paper-arXiv-green)](https://arxiv.org/pdf/2310.19721.pdf)
+
 ProMISe: **Pro**mpt-driven  3D **M**edical **I**mage **Se**gmentation Using Pretrained Image Foundation Models
 ```
 @article{li2023promise,
