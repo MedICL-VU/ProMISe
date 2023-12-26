@@ -244,7 +244,7 @@ class BaseVolumeDataset(Dataset):
                             prob=0.8,
                             min_zoom=0.85,
                             max_zoom=1.25,
-                            mode=["trilinear", "trilinear"],
+                            mode=["trilinear", "nearest"],
                         ),
                     ]
                 )
