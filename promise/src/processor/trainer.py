@@ -107,6 +107,7 @@ class Trainer(object):
                 # mask_binary = mask_binary.unsqueeze(1).float().requires_grad_(True)
                 # mask_edge = abs(mask_binary - self.pooling_layer(mask_binary))
                 # loss_distance = self.loss_boundary(mask_edge, seg_edge) * 10
+                mask_edge = abs(mask_probs - self.pooling_layer(mask_probs))
                 loss_distance = self.loss_boundary(mask_probs, seg_edge) * 10
             else:
                 loss_distance = torch.tensor(0)
