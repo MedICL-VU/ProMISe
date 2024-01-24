@@ -100,12 +100,16 @@ class Trainer(object):
 
             if seg.sum() > 0:
                 seg_edge = abs(seg - self.pooling_layer(seg))
-                mask_probs = torch.softmax(masks, dim=1) # F.softmax(masks, dim=1)
-                # mask_probs.requires_grad_(True)
-
-                _, mask_binary = torch.max(mask_probs.data, 1)
+                mask_probs = torch.softmax(masks, dim=1)
                 mask_edge = abs(mask_probs - self.pooling_layer(mask_probs))
-                loss_distance = self.loss_boundary(mask_probs, seg_edge) * 10
+                loss_distance = self.loss_boundary(mask_edge, seg_edge) * 10
+
+                # mask_relu = nn.ReLU()
+                # mask_probs_relu = mask_relu(mask_probs-0.5)
+                # mask_loss = torch.ones_like(mask_probs_relu)
+                # mask_loss[mask_probs_relu != 0] = mask_probs_relu[mask_probs_relu != 0] / mask_probs_relu[mask_probs_relu != 0]
+                # mask_edge = abs(mask_loss - self.pooling_layer(mask_loss))
+                # loss_distance = self.loss_boundary(mask_probs, seg_edge) * 10
             else:
                 loss_distance = torch.tensor(0)
             loss = loss_dice + loss_distance
