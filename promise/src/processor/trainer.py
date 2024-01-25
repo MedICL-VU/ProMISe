@@ -108,6 +108,7 @@ class Trainer(object):
                 # mask_probs_relu = mask_relu(mask_probs-0.5)
                 # mask_loss = torch.ones_like(mask_probs_relu)
                 # mask_loss[mask_probs_relu != 0] = mask_probs_relu[mask_probs_relu != 0] / mask_probs_relu[mask_probs_relu != 0]
+                # mask_loss = mask_loss[0, 1, :].unsqueeze(0).unsqueeze(0)
                 # mask_edge = abs(mask_loss - self.pooling_layer(mask_loss))
                 # loss_distance = self.loss_boundary(mask_probs, seg_edge) * 10
             else:
