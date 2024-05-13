@@ -63,8 +63,8 @@ use [pretrained ProMISe](https://drive.google.com/drive/folders/1Yol2tIaNYVve6JQ
 
 
 TODO:
-1. build this page for better instructions.
-2. Pytorch DistributedDataParallel.
+1. build this page for better instruction.
+2. Pytorch DistributedDataParallel. The DDP implementation can be viewed in our [latest work](https://github.com/MedICL-VU/PRISM)
 
 ---------------------------------
 
