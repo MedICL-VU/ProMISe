@@ -22,7 +22,7 @@ parser.add_argument("--lr", default=4e-4, type=float)
 parser.add_argument("--device", default="cuda:0", type=str)
 parser.add_argument("--max_epoch", default=200, type=int)
 parser.add_argument("--batch_size", default=1, type=int)
-parser.add_argument("--rand_crop_size", default=0, nargs='+', type=int)
+parser.add_argument("--rand_crop_size", default=(128, 128, 128), nargs='+', type=int)
 parser.add_argument("--checkpoint", default="best", type=str)
 parser.add_argument("--checkpoint_sam", default="./checkpoint_sam/sam_vit_b_01ec64.pth", type=str,
                     help='path of pretrained SAM')
