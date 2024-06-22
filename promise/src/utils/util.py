@@ -109,7 +109,7 @@ def save_predict(args, logger,
         patient_name):
 
     device = args.device
-    save_predict_dir = os.path.join(args.save_base_dir, 'predictions')
+    save_predict_dir = os.path.join(args.save_test_dir, 'predictions')
     if not os.path.exists(save_predict_dir):
         os.makedirs(save_predict_dir)
 
