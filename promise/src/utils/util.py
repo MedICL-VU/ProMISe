@@ -116,16 +116,26 @@ def save_predict(args, logger,
     x, y, z = points_dict['x_location'], points_dict['y_location'], points_dict['z_location']
     x_dimension, y_dimension, z_dimension = points_dict['x_dimension'], points_dict['y_dimension'], points_dict['z_dimension']
     # order see save_name and apply permute --> permute(test_data.dataset.spatial_index)
-    new_x = torch.round(x * seg.shape[4] / x_dimension).long()
-    new_y = torch.round(y * seg.shape[3] / y_dimension).long()
-    new_z = torch.round(z * seg.shape[2] / z_dimension).long()
+    if args.data == 'placenta':
+        new_x = torch.round(x * seg.shape[2] / x_dimension).long()
+        new_y = torch.round(y * seg.shape[4] / y_dimension).long()
+        new_z = torch.round(z * seg.shape[3] / z_dimension).long()
+    else:
+        new_x = torch.round(x * seg.shape[4] / x_dimension).long()
+        new_y = torch.round(y * seg.shape[3] / y_dimension).long()
+        new_z = torch.round(z * seg.shape[2] / z_dimension).long()
 
     save_prediction_path = os.path.join(save_predict_dir, patient_name.replace('.nii.gz', '_prediction' + '.nii.gz'))
     save_image(pred, test_data, image_data, save_prediction_path)
 
 
     seg_points = torch.zeros_like(seg).to(device)
-    seg_points[0, 0, new_z, new_y, new_x] = 1
+    
+    if args.data == 'placenta':
+        seg_points[0, 0, new_x, new_z, new_y] = 1
+    else:
+        seg_points[0, 0, new_z, new_y, new_x] = 1
+        
     save_point_path = os.path.join(save_predict_dir, patient_name.replace('.nii.gz', '_point' + '.nii.gz'))
     save_image(seg_points, test_data, image_data, save_point_path)
 
