@@ -33,6 +33,7 @@ parser.add_argument("--boundary_kernel_size", default=5, type=int,
                     help='an integer for kernel size of avepooling layer for boundary generation')
 parser.add_argument("--use_pretrain", action="store_true")
 parser.add_argument("--pretrain_path", default="", type=str)
+parser.add_argument("--seed", default=42, type=int)
 
 # saving
 parser.add_argument("--save_predictions", action="store_true")
