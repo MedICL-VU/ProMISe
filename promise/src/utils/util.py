@@ -121,6 +121,7 @@ def save_predict(args, logger,
         new_y = torch.round(y * seg.shape[4] / y_dimension).long()
         new_z = torch.round(z * seg.shape[3] / z_dimension).long()
     else:
+        # x, y, z may not be correct for visualization, double check these
         new_x = torch.round(x * seg.shape[4] / x_dimension).long()
         new_y = torch.round(y * seg.shape[3] / y_dimension).long()
         new_z = torch.round(z * seg.shape[2] / z_dimension).long()
