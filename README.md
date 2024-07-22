@@ -2,14 +2,7 @@
 [![Paper](https://img.shields.io/badge/paper-arXiv-green)](https://arxiv.org/pdf/2310.19721.pdf)
 
 ProMISe: **Pro**mpt-driven  3D **M**edical **I**mage **Se**gmentation Using Pretrained Image Foundation Models
-```
-@article{li2023promise,
-  title={Promise: Prompt-driven 3D Medical Image Segmentation Using Pretrained Image Foundation Models},
-  author={Li, Hao and Liu, Han and Hu, Dewei and Wang, Jiacheng and Oguz, Ipek},
-  journal={arXiv preprint arXiv:2310.19721},
-  year={2023}
-}
-```
+
 
 ---------------------------------
 **Recent news**
@@ -68,8 +61,23 @@ TODO:
 
 ---------------------------------
 
+Please shoot an email to hao.li.1@vanderbilt.edu for any questions, and I am always happy to help! :)
 
-Please shot an email to hao.li.1@vanderbilt.edu for any questions and always happy to help! :)
 
-
+```
+@article{li2023promise,
+  title={Promise: Prompt-driven 3D Medical Image Segmentation Using Pretrained Image Foundation Models},
+  author={Li, Hao and Liu, Han and Hu, Dewei and Wang, Jiacheng and Oguz, Ipek},
+  journal={arXiv preprint arXiv:2310.19721},
+  year={2023}
+}
+```
+```
+@article{li2023assessing,
+  title={Assessing Test-time Variability for Interactive 3D Medical Image Segmentation with Diverse Point Prompts},
+  author={Li, Hao and Liu, Han and Hu, Dewei and Wang, Jiacheng and Oguz, Ipek},
+  journal={arXiv preprint arXiv:2311.07806},
+  year={2023}
+}
+```
 
